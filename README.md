@@ -6,6 +6,8 @@ operator-sdk add api --api-version=app.example.com/v1alpha1 --kind=AppService
 operator-sdk add controller --api-version=app.example.com/v1alpha1 --kind=AppService
 operator-sdk olm-catalog gen-csv --csv-version=0.0.1
 
+cp deploy/crds/*crd.yaml deploy/olm-catalog/example-operator/0.0.1
+
 sed -i 's|REPLACE_IMAGE|quay.io/nmalik/example-operator:latest|g' deploy/operator.yaml
 sed -i 's|placeholder|example-operator|g' $(find deploy/ -name '*clusterserviceversion.yaml')
 ```
