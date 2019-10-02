@@ -1,0 +1,6 @@
+FROM quay.io/openshift/origin-operator-registry:latest
+
+COPY deploy/olm-catalog/example-operator/ manifests
+RUN initializer --permissive
+
+CMD ["registry-server", "-t", "/tmp/terminate.log"]

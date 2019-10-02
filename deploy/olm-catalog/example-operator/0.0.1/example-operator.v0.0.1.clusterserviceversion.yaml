@@ -8,11 +8,6 @@ metadata:
   namespace: openshift-nmalik
 spec:
   apiservicedefinitions: {}
-  customresourcedefinitions:
-    owned:
-    - kind: AppService
-      name: appservices.app.example.com
-      version: v1alpha1
   description: Placeholder description
   displayName: Example Operator
   install:
