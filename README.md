@@ -32,3 +32,35 @@ oc apply -R -f install/openshift-4.1/
 oc delete ns example-operator
 oc apply -R -f install/openshift-4.2/
 ```
+
+## Verify Privilege Escalation
+The whole point of making this install via a `CatalogSource` and `OperatorGroup` was to check assumptions on the feature added in OCP 4.2 that allows you to tie an `OperatorGroup` to a `ServiceAccount` for operator installation.  Instead of using cluster-admin, it uses that SA.
+
+In this test, we'll be checking that the operator that's installed *fails* because OLM, using the provided SA, cannot grant the RBAC requested.
+
+We do this by taking the `Role` assigned to the `ServiceAccount` (which is simply exactly what the operator requests) and removing sometime.
+
+```
+oc delete ns example-operator
+oc apply -R -f install/openshift-4.2-broken-rbac/
+```
+
+And if it works, we can prove it shouldn't be able to do that by:
+1. delete the `RoleBinding` to `exmaple-operator` SA
+1. login as the SA `operatorgroup-sa`
+1. attempt to grant the role to `example-operator` SA
+
+```
+ROLE_NAME=$(oc -n example-operator get roles -l olm.owner=example-operator.v0.0.1 -o jsonpath='{.items[].metadata.name}')
+
+ROLEBINDING_NAME=$(oc -n example-operator get rolebindings -l olm.owner=example-operator.v0.0.1 -o jsonpath='{.items[].metadata.name}')
+
+oc get rolebinding $ROLEBINDING_NAME -o yaml > /tmp/example-operator.rolebinding.yaml
+oc delete -f /tmp/example-operator.rolebinding.yaml
+
+TOKEN=$(oc -n example-operator get secret $(oc -n example-operator get secret --no-headers | grep operatorgroup-sa-token | head -n1 | awk '{print $1}') -o jsonpath='{.data.token}' | base64 --decode)
+API_SERVER=$(oc get infrastructures cluster -o jsonpath='{.status.apiServerURL}')
+oc login $API_SERVER --token=$TOKEN
+
+oc create -f /tmp/example-operator.rolebinding.yaml
+```

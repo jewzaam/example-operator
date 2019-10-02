@@ -4,5 +4,6 @@ metadata:
   name: example-operators
   namespace: example-operator
 spec:
+  serviceAccountName: operatorgroup-sa
   targetNamespaces:
   - example-operator

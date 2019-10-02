@@ -1,7 +1,7 @@
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: example-operator
+  name: operatorgroup-sa
   namespace: example-operator
 subjects:
 - kind: ServiceAccount
