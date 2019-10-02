@@ -19,7 +19,14 @@ docker push quay.io/nmalik/example-operator
 docker push quay.io/nmalik/example-operator-registry
 ```
 
-# Install
+# Install: OCP 4.1
 ```
-oc apply -R -f install/
+oc delete ns example-operator
+oc apply -R -f install/openshift-4.1/
+```
+
+# Install: OCP 4.2
+```
+oc delete ns example-operator
+oc apply -R -f install/openshift-4.2/
 ```
