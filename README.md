@@ -45,7 +45,23 @@ oc delete ns example-operator
 oc apply -R -f install/openshift-4.2-broken-rbac/
 ```
 
-And if it works, we can prove it shouldn't be able to do that by:
+You should see the install fail.  You can view this in the `InstallPlan`:
+
+```
+$ oc -n example-operator get installplan -o json | jq -r '.items[].status.conditions'
+[
+  {
+    "lastTransitionTime": "2019-10-02T20:38:01Z",
+    "lastUpdateTime": "2019-10-02T20:38:01Z",
+    "message": "error creating csv example-operator.v0.0.1: clusterserviceversions.operators.coreos.com is forbidden: User \"system:serviceaccount:example-operator:operatorgroup-sa\" cannot create resource \"clusterserviceversions\" in API group \"operators.coreos.com\" in the namespace \"example-operator\"",
+    "reason": "InstallComponentFailed",
+    "status": "False",
+    "type": "Installed"
+  }
+]
+```
+
+If you do see it installed, we can prove it shouldn't be able to do that by:
 1. delete the `RoleBinding` to `exmaple-operator` SA
 1. login as the SA `operatorgroup-sa`
 1. attempt to grant the role to `example-operator` SA
