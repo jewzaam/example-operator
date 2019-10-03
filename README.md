@@ -21,19 +21,31 @@ docker push quay.io/nmalik/example-operator
 docker push quay.io/nmalik/example-operator-registry
 ```
 
-# Install: OCP 4.1
+# Install
+
+## Install: OCP 4.1
 ```
 oc delete ns example-operator
 oc apply -R -f install/openshift-4.1/
 ```
 
-# Install: OCP 4.2
+
+## Install via OpeatorSource
+First the operator must be published to quay.io as an [application registry](#publish-as-app-registry).
+
+Then:
+```bash
+oc delete ns example-operator
+oc apply -R -f install/operatorsource/
+```
+
+## Install: OCP 4.2
 ```
 oc delete ns example-operator
 oc apply -R -f install/openshift-4.2/
 ```
 
-## Verify Privilege Escalation
+### Verify Privilege Escalation
 The whole point of making this install via a `CatalogSource` and `OperatorGroup` was to check assumptions on the feature added in OCP 4.2 that allows you to tie an `OperatorGroup` to a `ServiceAccount` for operator installation.  Instead of using cluster-admin, it uses that SA.
 
 In this test, we'll be checking that the operator that's installed *fails* because OLM, using the provided SA, cannot grant the RBAC requested.
@@ -79,4 +91,38 @@ API_SERVER=$(oc get infrastructures cluster -o jsonpath='{.status.apiServerURL}'
 oc login $API_SERVER --token=$TOKEN
 
 oc create -f /tmp/example-operator.rolebinding.yaml
+```
+
+# Publish As App Registry
+
+Refernce: https://github.com/operator-framework/community-operators/blob/master/docs/testing-operators.md#push-to-quayio
+
+Create new [organization](https://docs.quay.io/glossary/organizations.html) "example-operator".  Note the **+** may not be visible if browser is scaled down.
+
+```bash
+echo -n "Username: " && \
+read QUAY_USERNAME && \
+echo -n "Password: " && \
+read -s QUAY_PASSWORD && \
+echo
+
+export QUAY_TOKEN=$(curl -s -H "Content-Type: application/json" -XPOST https://quay.io/cnr/api/v1/users/login -d '
+  {
+      "user": {
+          "username": "'"${QUAY_USERNAME}"'",
+          "password": "'"${QUAY_PASSWORD}"'"
+      }
+  }' | jq -r .token)
+unset QUAY_USERNAME
+unset QUAY_PASSWORD
+
+export OPERATOR_DIR=deploy/olm-catalog/example-operator/
+export QUAY_NAMESPACE=nmalik-operators
+export PACKAGE_NAME=example-operator
+export PACKAGE_VERSION=0.0.1
+export TOKEN=$QUAY_TOKEN
+
+
+operator-courier --verbose verify --ui_validate_io $OPERATOR_DIR 2>&1 | grep ^ERROR
+operator-courier push "$OPERATOR_DIR" "$QUAY_NAMESPACE" "$PACKAGE_NAME" "$PACKAGE_VERSION" "$TOKEN"
 ```
