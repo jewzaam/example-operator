@@ -11,9 +11,12 @@ import (
 
 func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenAPIDefinition {
 	return map[string]common.OpenAPIDefinition{
-		"github.com/jewzaam/example-operator/pkg/apis/app/v1alpha1.AppService":       schema_pkg_apis_app_v1alpha1_AppService(ref),
-		"github.com/jewzaam/example-operator/pkg/apis/app/v1alpha1.AppServiceSpec":   schema_pkg_apis_app_v1alpha1_AppServiceSpec(ref),
-		"github.com/jewzaam/example-operator/pkg/apis/app/v1alpha1.AppServiceStatus": schema_pkg_apis_app_v1alpha1_AppServiceStatus(ref),
+		"github.com/jewzaam/example-operator/pkg/apis/app/v1alpha1.AppService":           schema_pkg_apis_app_v1alpha1_AppService(ref),
+		"github.com/jewzaam/example-operator/pkg/apis/app/v1alpha1.AppServiceSpec":       schema_pkg_apis_app_v1alpha1_AppServiceSpec(ref),
+		"github.com/jewzaam/example-operator/pkg/apis/app/v1alpha1.AppServiceStatus":     schema_pkg_apis_app_v1alpha1_AppServiceStatus(ref),
+		"github.com/jewzaam/example-operator/pkg/apis/app/v1alpha1.ClusterExample":       schema_pkg_apis_app_v1alpha1_ClusterExample(ref),
+		"github.com/jewzaam/example-operator/pkg/apis/app/v1alpha1.ClusterExampleSpec":   schema_pkg_apis_app_v1alpha1_ClusterExampleSpec(ref),
+		"github.com/jewzaam/example-operator/pkg/apis/app/v1alpha1.ClusterExampleStatus": schema_pkg_apis_app_v1alpha1_ClusterExampleStatus(ref),
 	}
 }
 
@@ -77,6 +80,73 @@ func schema_pkg_apis_app_v1alpha1_AppServiceStatus(ref common.ReferenceCallback)
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
 				Description: "AppServiceStatus defines the observed state of AppService",
+				Properties:  map[string]spec.Schema{},
+			},
+		},
+		Dependencies: []string{},
+	}
+}
+
+func schema_pkg_apis_app_v1alpha1_ClusterExample(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ClusterExample is the Schema for the clusterexamples API",
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+						},
+					},
+					"spec": {
+						SchemaProps: spec.SchemaProps{
+							Ref: ref("github.com/jewzaam/example-operator/pkg/apis/app/v1alpha1.ClusterExampleSpec"),
+						},
+					},
+					"status": {
+						SchemaProps: spec.SchemaProps{
+							Ref: ref("github.com/jewzaam/example-operator/pkg/apis/app/v1alpha1.ClusterExampleStatus"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/jewzaam/example-operator/pkg/apis/app/v1alpha1.ClusterExampleSpec", "github.com/jewzaam/example-operator/pkg/apis/app/v1alpha1.ClusterExampleStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+	}
+}
+
+func schema_pkg_apis_app_v1alpha1_ClusterExampleSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ClusterExampleSpec defines the desired state of ClusterExample",
+				Properties:  map[string]spec.Schema{},
+			},
+		},
+		Dependencies: []string{},
+	}
+}
+
+func schema_pkg_apis_app_v1alpha1_ClusterExampleStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ClusterExampleStatus defines the observed state of ClusterExample",
 				Properties:  map[string]spec.Schema{},
 			},
 		},

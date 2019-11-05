@@ -1,0 +1,7 @@
+apiVersion: app.example.com/v1alpha1
+kind: ClusterExample
+metadata:
+  name: example-clusterexample
+spec:
+  # Add fields here
+  size: 3

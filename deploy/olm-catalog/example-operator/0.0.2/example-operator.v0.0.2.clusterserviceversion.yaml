@@ -2,9 +2,9 @@ apiVersion: operators.coreos.com/v1alpha1
 kind: ClusterServiceVersion
 metadata:
   annotations:
-    alm-examples: '[{"apiVersion":"app.example.com/v1alpha1","kind":"AppService","metadata":{"name":"example-appservice"},"spec":{"size":3}}]'
+    alm-examples: '[{"apiVersion":"app.example.com/v1alpha1","kind":"AppService","metadata":{"name":"example-appservice"},"spec":{"size":3}},{"apiVersion":"app.example.com/v1alpha1","kind":"ClusterExample","metadata":{"name":"example-clusterexample"},"spec":{"size":3}}]'
     capabilities: Basic Install
-  name: example-operator.v0.0.1
+  name: example-operator.v0.0.2
   namespace: example-operator
 spec:
   apiservicedefinitions: {}
@@ -12,6 +12,9 @@ spec:
     owned:
     - kind: AppService
       name: appservices.app.example.com
+      version: v1alpha1
+    - kind: ClusterExample
+      name: clusterexamples.app.example.com
       version: v1alpha1
   description: Placeholder description
   displayName: Example Operator
@@ -103,6 +106,7 @@ spec:
           - app.example.com
           resources:
           - '*'
+          - clusterexamples
           verbs:
           - '*'
         serviceAccountName: example-operator
@@ -118,4 +122,5 @@ spec:
     type: AllNamespaces
   maturity: alpha
   provider: {}
-  version: 0.0.1
+  replaces: example-operator.v0.0.1
+  version: 0.0.2

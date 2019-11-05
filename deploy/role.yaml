@@ -56,5 +56,6 @@ rules:
   - app.example.com
   resources:
   - '*'
+  - clusterexamples
   verbs:
   - '*'

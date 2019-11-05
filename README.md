@@ -1,25 +1,75 @@
-# Create Source
+# Version 0.0.1
+
+## Create Source
 ```
+export GO111MODULE=on
+export VERSION=0.0.1
 operator-sdk new example-operator
 cd example-operator
 operator-sdk add api --api-version=app.example.com/v1alpha1 --kind=AppService
 operator-sdk add controller --api-version=app.example.com/v1alpha1 --kind=AppService
-operator-sdk olm-catalog gen-csv --csv-version=0.0.1
+operator-sdk olm-catalog gen-csv --csv-version=$VERSION
 
-cp deploy/crds/*crd.yaml deploy/olm-catalog/example-operator/0.0.1
+cp deploy/crds/*crd.yaml deploy/olm-catalog/example-operator/$VERSION
 
 sed -i 's|REPLACE_IMAGE|quay.io/nmalik/example-operator:latest|g' deploy/operator.yaml
-sed -i 's|placeholder|example-operator|g' $(find deploy/ -name '*clusterserviceversion.yaml')
+sed -i 's|placeholder|example-operator|g' $(find deploy/olm-catalog/example-operator/$VERSION/ -name '*clusterserviceversion.yaml')
 ```
 
-# Build & Push Images
+## Build & Push Images
 ```
-operator-sdk build quay.io/nmalik/example-operator
+export GO111MODULE=on
+export VERSION=0.0.1
+operator-sdk build quay.io/nmalik/example-operator:$VERSION
 docker build -f build/Dockerfile.catalog_registry -t quay.io/nmalik/example-operator-registry .
 
-docker push quay.io/nmalik/example-operator
-docker push quay.io/nmalik/example-operator-registry
+docker tag quay.io/nmalik/example-operator:$VERSION quay.io/nmalik/example-operator:latest
+docker tag quay.io/nmalik/example-operator-registry:$VERSION quay.io/nmalik/example-operator-registry:latest
+
+docker push quay.io/nmalik/example-operator:$VERSION
+docker push quay.io/nmalik/example-operator:latest
+docker push quay.io/nmalik/example-operator-registry:$VERSION
+docker push quay.io/nmalik/example-operator-registry:latest
 ```
+
+# Version 0.0.2
+
+## Create Source
+To have something change we'll add an empty CRD.
+Note we are not going to update `currentCSV` in `deploy/olm-catalog/example-operator.package.yaml` so we'll get the upgrade behavior triggered by OLM on operator installation.
+
+```
+export GO111MODULE=on
+export VERSION=0.0.2
+export FROM_VERSION=0.0.1
+
+operator-sdk add api --api-version=app.example.com/v1alpha1 --kind=ClusterExample
+
+operator-sdk olm-catalog gen-csv --csv-version=$VERSION --from-version=$FROM_VERSION
+
+cp deploy/crds/*crd.yaml deploy/olm-catalog/example-operator/$VERSION
+
+sed -i 's|REPLACE_IMAGE|quay.io/nmalik/example-operator:latest|g' deploy/operator.yaml
+sed -i 's|placeholder|example-operator|g' $(find deploy/olm-catalog/example-operator/$VERSION/ -name '*clusterserviceversion.yaml')
+```
+
+## Build & Push Images
+```
+export GO111MODULE=on
+export VERSION=0.0.2
+operator-sdk build quay.io/nmalik/example-operator:$VERSION
+docker build -f build/Dockerfile.catalog_registry -t quay.io/nmalik/example-operator-registry .
+
+docker tag quay.io/nmalik/example-operator:$VERSION quay.io/nmalik/example-operator:latest
+docker tag quay.io/nmalik/example-operator-registry:$VERSION quay.io/nmalik/example-operator-registry:latest
+
+docker push quay.io/nmalik/example-operator:$VERSION
+docker push quay.io/nmalik/example-operator:latest
+docker push quay.io/nmalik/example-operator-registry:$VERSION
+docker push quay.io/nmalik/example-operator-registry:latest
+```
+
+
 
 # Install
 
@@ -28,7 +78,6 @@ docker push quay.io/nmalik/example-operator-registry
 oc delete ns example-operator
 oc apply -R -f install/openshift-4.1/
 ```
-
 
 ## Install via OpeatorSource
 First the operator must be published to quay.io as an [application registry](#publish-as-app-registry).
