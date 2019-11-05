@@ -61,15 +61,13 @@ operator-sdk build quay.io/nmalik/example-operator:$VERSION
 docker build -f build/Dockerfile.catalog_registry -t quay.io/nmalik/example-operator-registry .
 
 docker tag quay.io/nmalik/example-operator:$VERSION quay.io/nmalik/example-operator:latest
-docker tag quay.io/nmalik/example-operator-registry:$VERSION quay.io/nmalik/example-operator-registry:latest
+docker tag quay.io/nmalik/example-operator-registry:latest quay.io/nmalik/example-operator-registry:$VERSION
 
 docker push quay.io/nmalik/example-operator:$VERSION
 docker push quay.io/nmalik/example-operator:latest
 docker push quay.io/nmalik/example-operator-registry:$VERSION
 docker push quay.io/nmalik/example-operator-registry:latest
 ```
-
-
 
 # Install
 
