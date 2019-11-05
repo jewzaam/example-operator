@@ -8,6 +8,6 @@ spec:
   icon:
     base64data: ""
     mediatype: ""
-  image: quay.io/nmalik/example-operator-registry:latest
+  image: quay.io/nmalik/example-operator-registry:0.0.1
   publisher: Naveen Malik
   sourceType: grpc

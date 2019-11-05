@@ -13,9 +13,13 @@ spec:
     - kind: AppService
       name: appservices.app.example.com
       version: v1alpha1
+      displayName: example-operator
+      description: example-operator
     - kind: ClusterExample
       name: clusterexamples.app.example.com
       version: v1alpha1
+      displayName: example-operator
+      description: example-operator
   description: Placeholder description
   displayName: Example Operator
   install:
@@ -55,7 +59,7 @@ spec:
       permissions:
       - rules:
         - apiGroups:
-          - ""
+          - ''
           resources:
           - pods
           - services
@@ -91,7 +95,7 @@ spec:
           verbs:
           - update
         - apiGroups:
-          - ""
+          - ''
           resources:
           - pods
           verbs:

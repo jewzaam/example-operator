@@ -9,4 +9,3 @@ spec:
   name: example-operator
   source: example-operator-registry
   sourceNamespace: example-operator
-  startingCSV: example-operator.v0.0.1

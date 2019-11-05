@@ -51,6 +51,13 @@ cp deploy/crds/*crd.yaml deploy/olm-catalog/example-operator/$VERSION
 
 sed -i 's|REPLACE_IMAGE|quay.io/nmalik/example-operator:latest|g' deploy/operator.yaml
 sed -i 's|placeholder|example-operator|g' $(find deploy/olm-catalog/example-operator/$VERSION/ -name '*clusterserviceversion.yaml')
+
+# add missing crd properties
+CSV_FILENAME=$(find deploy/olm-catalog/example-operator/$VERSION/ -name '*clusterserviceversion.yaml')
+cat $CSV_FILENAME | yq -r -y '.spec.customresourcedefinitions.owned[0].displayName = "example-operator" | .spec.customresourcedefinitions.owned[0].description = "example-operator" | .spec.customresourcedefinitions.owned[1].displayName = "example-operator" | .spec.customresourcedefinitions.owned[1].description = "example-operator"' > $CSV_FILENAME
+
+# bump default CSV version
+sed -i 's|0.0.1|0.0.2|g' deploy/olm-catalog/example-operator/example-operator.package.yaml
 ```
 
 ## Build & Push Images
@@ -69,7 +76,16 @@ docker push quay.io/nmalik/example-operator-registry:$VERSION
 docker push quay.io/nmalik/example-operator-registry:latest
 ```
 
+## Delete Source
+To go back to the 0.0.1 source and rest the olm catalog:
+```bash
+rm -rf deploy/olm-catalog
+rm -rf deploy/crds
+```
+
 # Install
+
+By default all installs are version 0.0.1.
 
 ## Install: OCP 4.1
 ```
@@ -139,6 +155,19 @@ oc login $API_SERVER --token=$TOKEN
 
 oc create -f /tmp/example-operator.rolebinding.yaml
 ```
+
+# Upgrade
+Assuming version `0.0.1` was installed, which is the default, you can upgrade with:
+
+```bash
+oc -n example-operator get catalogsource example-operator-registry -o json | jq -r '.spec.image = "quay.io/nmalik/example-operator-registry:0.0.2"' | oc replace -f -
+```
+
+This will:
+1. replace the `CatalogSource`
+1. create a new `InstallPlan`
+1. create a new `ClusterServiceVersion` (`CSV`)
+1. install the `0.0.2` version of the operator
 
 # Publish As App Registry
 
